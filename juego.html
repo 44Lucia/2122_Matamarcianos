@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head><title>MATAMARCIANOS THE GAME </title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.55.2/phaser.min.js"></script>
+
+</head>
+
+<body>
+
+	<h1>Vienvenido al juego de los marcianos</h1>
+
+	<script>
+				
+		physics:{
+			default:'arcade',
+		    arcade:{
+		    debug: true
+		    }
+	    },
+		scene: {
+		    preload: preload,
+		    create: create,
+		    update: update
+		}
+		};
+		
+		let game = new Phaser.Game(config);
+
+	</script>
+
+</body>
+</html>
