@@ -16,9 +16,19 @@
 		
 		let bg_img;
 		let pj_img;
+		let pj_bullet;
+		let enm_img;
+		let enm2_img;
+		let enm3_img;
 
 		let	cursors;
 		let speed = 3;
+		let enemySpeed = 1;
+		
+		let lives = 3;
+		let lives_text;
+		let score = 0;
+		let score_text;
 
 		let config = {
 		width: game_w,
@@ -42,29 +52,64 @@
 			this.load.image ("espacio", "Background.png");
 			this.load.image ("player", "Nave.png");	
 			this.load.image ("pj_bullet", "BalaPlayer.png");
+			this.load.image ("enemy", "NaveEnemigo.png");
 		}
 
 		function create(){
 			bg_img = this.add.image(game_w/2 , game_h/2 , "espacio");
-			pj_img = this.add.image(150, 300, "player");
+			pj_bullet = this.add.image(120, 300, "pj_bullet");
+			pj_img = this.add.image(120, 300, "player"); 
+			enm_img = this.add.image(890, 150, "enemy");
+			enm2_img = this.add.image(1850, 300, "enemy");
+			enm3_img = this.add.image(1350, 450, "enemy");
+
 			this.physics.add.existing(pj_img, false);
+			this.physics.add.existing(enm_img, false);
+			this.physics.add.existing(enm2_img, false);
+			this.physics.add.existing(enm3_img, false);
+			
 			pj_img.setScale(0.7);
 
+			let enemies = [enm_img, enm2_img, enm3_img];
+
+			for (let i = 0; i < enemies.length; i++){
+				enemies[i].setScale(0.7);
+				this.physics.add.collider(pj_img, enemies[i], function (ship, enemy){
+					lives--;
+					lives_text.text = lives.toString();
+				});
+			}
+
+			this.add.text(game_w/2 - 350, 54, "LIVES: ");
+			lives_text = this.add.text(game_w/2 - 350 + 64, 54, "3");
+   		    this.add.text(game_w/2 - 350, 70, "POINTS: ");
+            score_text = this.add.text(game_w/2 - 350 + 68, 70, "0");
+	
 			cursors = this.input.keyboard.createCursorKeys();
 			graphics = this.add.graphics();
 		}
 
 		function update(time, delta){
-			if (cursors.up.isDown){
+			if (cursors.up.isDown && pj_img.y > game_h-560){
 				pj_img.y -= speed;
+				pj_bullet.y -= speed;
 			}
-			if (cursors.down.isDown){
+			if (cursors.down.isDown && pj_img.y < game_h-40 ){
 				pj_img.y += speed;
+				pj_bullet.y += speed;
 			}
-			let bala;
+			
+			let speedBullet = 1;
+			pj_bullet.x += speedBullet * delta;			
 			if (cursors.right.isDown){
-				
+				pj_bullet.x = 60;
 			}
+			
+			enm_img.x -= enemySpeed;
+			enm2_img.x -= enemySpeed;
+			enm3_img.x -= enemySpeed;
+			
+
 		}
 
 	</script>
