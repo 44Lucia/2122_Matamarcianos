@@ -20,8 +20,13 @@
 		let enm_img;
 		let enm2_img;
 		let enm3_img;
+		
+		let position_enm1_x = 890;
+		let position_enm2_x = 1850;
+		let position_enm3_x = 1350;
 
 		let	cursors;
+		let spaceKey;
 		let speed = 3;
 		let enemySpeed = 1;
 		
@@ -47,6 +52,28 @@
 		};
 		
 		let game = new Phaser.Game(config);
+		
+		function collisionEnemy(){
+			enm_img.x = position_enm1_x;
+			enm2_img.x = position_enm2_x;
+			enm3_img.x = position_enm3_x;
+		}
+
+		function collisionWall(enemy, position){
+			if(enemy.x < game_w-780){
+				enemy.x = position;
+				lives--;
+            	lives_text.text = lives.toString();
+			}
+		}
+
+		function killEnemy(enemy, position, bullet, scene){
+			scene.physics.add.collider(enemy, bullet, function(enemies, bullets){
+				enemy.x = position;
+				score++;
+				score_text.text = lives.toString();
+			});
+		}
 
 		function preload(){
 			this.load.image ("espacio", "Background.png");
@@ -59,11 +86,12 @@
 			bg_img = this.add.image(game_w/2 , game_h/2 , "espacio");
 			pj_bullet = this.add.image(120, 300, "pj_bullet");
 			pj_img = this.add.image(120, 300, "player"); 
-			enm_img = this.add.image(890, 150, "enemy");
-			enm2_img = this.add.image(1850, 300, "enemy");
-			enm3_img = this.add.image(1350, 450, "enemy");
+			enm_img = this.add.image(position_enm1_x, 150, "enemy");
+			enm2_img = this.add.image(position_enm2_x, 300, "enemy");
+			enm3_img = this.add.image(position_enm3_x, 450, "enemy");
 
 			this.physics.add.existing(pj_img, false);
+			this.physics.add.existing(pj_bullet, false);
 			this.physics.add.existing(enm_img, false);
 			this.physics.add.existing(enm2_img, false);
 			this.physics.add.existing(enm3_img, false);
@@ -75,6 +103,7 @@
 			for (let i = 0; i < enemies.length; i++){
 				enemies[i].setScale(0.7);
 				this.physics.add.collider(pj_img, enemies[i], function (ship, enemy){
+					collisionEnemy();
 					lives--;
 					lives_text.text = lives.toString();
 				});
@@ -87,6 +116,8 @@
 	
 			cursors = this.input.keyboard.createCursorKeys();
 			graphics = this.add.graphics();
+
+			this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 		}
 
 		function update(time, delta){
@@ -101,15 +132,21 @@
 			
 			let speedBullet = 1;
 			pj_bullet.x += speedBullet * delta;			
-			if (cursors.right.isDown){
+			if (Phaser.Input.Keyboard.JustDown(this.spaceKey)){
 				pj_bullet.x = 60;
 			}
 			
 			enm_img.x -= enemySpeed;
 			enm2_img.x -= enemySpeed;
 			enm3_img.x -= enemySpeed;
-			
 
+			killEnemy(enm_img, position_enm1_x, pj_bullet, this);
+     		killEnemy(enm2_img, position_enm2_x, pj_bullet, this);
+	    	killEnemy(enm3_img, position_enm3_x, pj_bullet, this);
+
+			collisionWall(enm_img, position_enm1_x+500);
+			collisionWall(enm2_img, position_enm2_x+100);
+			collisionWall(enm3_img, position_enm3_x+300);
 		}
 
 	</script>
