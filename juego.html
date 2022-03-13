@@ -196,10 +196,10 @@
 			
 			Shoot(this);
 			MoveBullets(delta);
-
-			enemies[0].x -= enemySpeed;
-			enemies[1].x -= enemySpeed;
-			enemies[2].x -= enemySpeed;
+			
+			for (let i = 0; i < enemies.length; i++){
+				enemies[i].x -= enemySpeed;
+			}
 
 			collisionWall(enemies[0], position_enm1_x+500);
 			collisionWall(enemies[1], position_enm2_x+100);
