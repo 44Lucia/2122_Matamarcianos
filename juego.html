@@ -28,12 +28,20 @@
 		let	cursors;
 		let spaceKey;
 		let speed = 3;
-		let enemySpeed = 1;
+		let enemySpeed = 2;
 		
 		let lives = 3;
 		let lives_text;
 		let score = 0;
 		let score_text;
+	
+	    let positions = [position_enm1_x, position_enm2_x, position_enm3_x];
+		let enemies =[];
+		let bullets=[];
+		
+		let speedBullet = 1;
+
+		let inGame = false;
 
 		let config = {
 		width: game_w,
@@ -54,9 +62,9 @@
 		let game = new Phaser.Game(config);
 		
 		function collisionEnemy(){
-			enm_img.x = position_enm1_x;
-			enm2_img.x = position_enm2_x;
-			enm3_img.x = position_enm3_x;
+			enemies[0].x = position_enm1_x;
+			enemies[1].x = position_enm2_x;
+			enemies[2].x = position_enm3_x;
 		}
 
 		function collisionWall(enemy, position){
@@ -67,14 +75,6 @@
 			}
 		}
 
-		function killEnemy(enemy, position, bullet, scene){
-			scene.physics.add.collider(enemy, bullet, function(enemies, bullets){
-				enemy.x = position;
-				score++;
-				score_text.text = lives.toString();
-			});
-		}
-
 		function preload(){
 			this.load.image ("espacio", "Background.png");
 			this.load.image ("player", "Nave.png");	
@@ -83,37 +83,42 @@
 		}
 
 		function create(){
+		
 			bg_img = this.add.image(game_w/2 , game_h/2 , "espacio");
-			pj_bullet = this.add.image(120, 300, "pj_bullet");
+			pj_bullet = this.add.image(900, 900, "pj_bullet");
 			pj_img = this.add.image(120, 300, "player"); 
-			enm_img = this.add.image(position_enm1_x, 150, "enemy");
-			enm2_img = this.add.image(position_enm2_x, 300, "enemy");
-			enm3_img = this.add.image(position_enm3_x, 450, "enemy");
+			enemies[0] = this.add.image(position_enm1_x, 150, "enemy");
+			enemies[1] = this.add.image(position_enm2_x, 300, "enemy");
+			enemies[2] = this.add.image(position_enm3_x, 450, "enemy");
 
 			this.physics.add.existing(pj_img, false);
 			this.physics.add.existing(pj_bullet, false);
-			this.physics.add.existing(enm_img, false);
-			this.physics.add.existing(enm2_img, false);
-			this.physics.add.existing(enm3_img, false);
+			this.physics.add.existing(enemies[0], false);
+			this.physics.add.existing(enemies[1], false);
+			this.physics.add.existing(enemies[2], false);
 			
 			pj_img.setScale(0.7);
-
-			let enemies = [enm_img, enm2_img, enm3_img];
-
+			
 			for (let i = 0; i < enemies.length; i++){
 				enemies[i].setScale(0.7);
-				this.physics.add.collider(pj_img, enemies[i], function (ship, enemy){
-					collisionEnemy();
-					lives--;
-					lives_text.text = lives.toString();
-				});
+                    this.physics.add.collider(pj_img, enemies[i], function (){
+                        collisionEnemy();
+                        lives--;
+                        lives_text.text = lives.toString();
+                    });
+					this.physics.add.collider(enemies[i], pj_bullet, function(){
+                 		enemies[i].x = positions[i];
+						pj_bullet.x = 2000;
+                 		score ++;
+                	 	score_text.text = score.toString();
+             		});
 			}
 
 			this.add.text(game_w/2 - 350, 54, "LIVES: ");
 			lives_text = this.add.text(game_w/2 - 350 + 64, 54, "3");
    		    this.add.text(game_w/2 - 350, 70, "POINTS: ");
             score_text = this.add.text(game_w/2 - 350 + 68, 70, "0");
-	
+		
 			cursors = this.input.keyboard.createCursorKeys();
 			graphics = this.add.graphics();
 
@@ -121,32 +126,27 @@
 		}
 
 		function update(time, delta){
+
 			if (cursors.up.isDown && pj_img.y > game_h-560){
 				pj_img.y -= speed;
-				pj_bullet.y -= speed;
 			}
 			if (cursors.down.isDown && pj_img.y < game_h-40 ){
 				pj_img.y += speed;
-				pj_bullet.y += speed;
 			}
 			
-			let speedBullet = 1;
-			pj_bullet.x += speedBullet * delta;			
+			pj_bullet.x += speedBullet * delta;
 			if (Phaser.Input.Keyboard.JustDown(this.spaceKey)){
-				pj_bullet.x = 60;
+				pj_bullet.x = pj_img.x + 50;
+				pj_bullet.y = pj_img.y;
 			}
 			
-			enm_img.x -= enemySpeed;
-			enm2_img.x -= enemySpeed;
-			enm3_img.x -= enemySpeed;
+			enemies[0].x -= enemySpeed;
+			enemies[1].x -= enemySpeed;
+			enemies[2].x -= enemySpeed;
 
-			killEnemy(enm_img, position_enm1_x, pj_bullet, this);
-     		killEnemy(enm2_img, position_enm2_x, pj_bullet, this);
-	    	killEnemy(enm3_img, position_enm3_x, pj_bullet, this);
-
-			collisionWall(enm_img, position_enm1_x+500);
-			collisionWall(enm2_img, position_enm2_x+100);
-			collisionWall(enm3_img, position_enm3_x+300);
+			collisionWall(enemies[0], position_enm1_x+500);
+			collisionWall(enemies[1], position_enm2_x+100);
+			collisionWall(enemies[2], position_enm3_x+300);
 		}
 
 	</script>
